@@ -1,14 +1,11 @@
 from uuid import uuid1
 
-from marshmallow import Schema, fields
-
-from .ghish_pull_requests import GhishPullRequest
-from .ghish_users import GhishUser
+from marshmallow import EXCLUDE, Schema, fields
 
 
 class GhishComment(Schema):
     _id = fields.UUID(missing=uuid1)
     comment_id = fields.Integer()
-    user = fields.Nested(GhishUser)
+    author = fields.Nested("GhishUser", required=False, unknown=EXCLUDE)
     create_date = fields.DateTime()
-    pull_request = fields.Nested(GhishPullRequest)
+    pull_request = fields.Nested("GhishPullRequest", required=False, unknown=EXCLUDE)

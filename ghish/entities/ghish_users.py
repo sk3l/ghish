@@ -1,13 +1,12 @@
 from uuid import uuid1
 
-from marshmallow import Schema, fields
-
-from .ghish_organizations import GhishOrganization
+from marshmallow import Schema, EXCLUDE, fields
 
 
 class GhishUser(Schema):
     _id = fields.UUID(missing=uuid1)
-    user_name = fields.String()
-    email = fields.String()
-    organization = fields.Nested(GhishOrganization, many=True)
-    url = fields.String()
+    user_id = fields.Integer(data_key="id")
+    user_name = fields.String(data_key="login")
+    email = fields.Email()
+    organizations = fields.Nested("GhishOrganization", many=True, required=False, unknown=EXCLUDE)
+    url = fields.String(data_key="html_url")
