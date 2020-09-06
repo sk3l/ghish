@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 
 def _parse_args():
@@ -88,6 +89,9 @@ def _parse_args():
         "pr_num", help="Fully-qualified pull requests (ORG/REPO/PRNUM) to lookup"
     )
 
+    if len(sys.argv) == 1:
+        parser.print_help()
+        parser.exit()
     parser.parse_args()
 
 
