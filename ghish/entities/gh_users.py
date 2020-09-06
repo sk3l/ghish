@@ -3,12 +3,17 @@ from uuid import uuid1
 from marshmallow import Schema, EXCLUDE, fields, pre_load
 
 
-class GhishUser(Schema):
+class GitHubUser(Schema):
+
+    def __init__(self):
+        super().__init__(unknown=EXCLUDE)
+
     _id = fields.UUID(missing=uuid1)
     user_id = fields.Integer()
     user_name = fields.String()
     email = fields.Email()
-    organizations = fields.Nested("GhishOrganization", many=True, required=False, unknown=EXCLUDE)
+    organizations = fields.Nested(
+            "GitHubOrganization", many=True, required=False, unknown=EXCLUDE)
     url = fields.String()
 
     @pre_load
