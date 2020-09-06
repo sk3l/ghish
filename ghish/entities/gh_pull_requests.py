@@ -3,21 +3,21 @@ from uuid import uuid1
 from marshmallow import EXCLUDE, Schema, fields, pre_load
 
 
-class GitHubPullRequest(Schema):
+class GitHubPullRequestSchema(Schema):
 
     def __init__(self):
         super().__init__(unknown=EXCLUDE)
 
     _id = fields.UUID(missing=uuid1)
     pr_id = fields.Integer()
-    repo = fields.Nested("GitHubRepo", required=False, unknown=EXCLUDE)
+    repo = fields.Nested("GitHubRepoSchema", required=False, unknown=EXCLUDE)
     title = fields.String()
-    author = fields.Nested("GitHubUser", required=False, unknown=EXCLUDE)
+    author = fields.Nested("GitHubUserSchema", required=False, unknown=EXCLUDE)
     create_date = fields.DateTime()
     comment_count = fields.Integer()
     review_comment_count = fields.Integer()
     pr_comments = fields.Nested(
-        "GitHubComment", many=True, required=False, unknown=EXCLUDE
+        "GitHubCommentSchema", many=True, required=False, unknown=EXCLUDE
     )
     url = fields.String()
 

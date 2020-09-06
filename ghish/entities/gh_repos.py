@@ -3,7 +3,7 @@ from uuid import uuid1
 from marshmallow import Schema, fields, EXCLUDE, pre_load
 
 
-class GitHubRepo(Schema):
+class GitHubRepoSchema(Schema):
 
     def __init__(self):
         super().__init__(unknown=EXCLUDE)
@@ -13,7 +13,8 @@ class GitHubRepo(Schema):
     repo_name = fields.String()
     repo_description = fields.String()
     create_date = fields.DateTime()
-    organization = fields.Nested("GitHubOrganization", required=False, unknown=EXCLUDE)
+    organization = fields.Nested(
+            "GitHubOrganizationSchema", required=False, unknown=EXCLUDE)
     url = fields.String()
 
     @pre_load

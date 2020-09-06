@@ -3,7 +3,7 @@ from uuid import uuid1
 from marshmallow import Schema, EXCLUDE, fields, pre_load
 
 
-class GitHubUser(Schema):
+class GitHubUserSchema(Schema):
 
     def __init__(self):
         super().__init__(unknown=EXCLUDE)
@@ -13,7 +13,7 @@ class GitHubUser(Schema):
     user_name = fields.String()
     email = fields.Email()
     organizations = fields.Nested(
-            "GitHubOrganization", many=True, required=False, unknown=EXCLUDE)
+            "GitHubOrganizationSchema", many=True, required=False, unknown=EXCLUDE)
     url = fields.String()
 
     @pre_load
