@@ -20,7 +20,7 @@ class GitHubReposProxy:
                 repo = results[0]
 
                 if include_prs:
-                    pull_requests = self._lookup_repo_pull_requests(name)
+                    pull_requests = self._lookup_repo_pull_requests(gh_agent, name)
                     if include_pr_comments:
                         for pr in pull_requests:
                             comments = self._lookup_repo_pull_request_comments(

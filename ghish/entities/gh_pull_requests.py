@@ -38,10 +38,13 @@ class GitHubPullRequestSchema(Schema):
 
     @pre_load
     def map_input_fields(self, in_data, **kwargs):
+
         in_data["pr_id"] = in_data.pop("id")
         in_data["author"] = in_data.pop("user")
         in_data["create_date"] = in_data.pop("created_at")
-        in_data["comment_count"] = in_data.pop("comments")
-        in_data["review_comment_count"] = in_data.pop("review_comments")
+        if "comments" in in_data:
+            in_data["comment_count"] = in_data.pop("comments")
+        if "review_comment_count" in in_data:
+            in_data["review_comment_count"] = in_data.pop("review_comments")
         in_data["url"] = in_data.pop("html_url")
         return in_data

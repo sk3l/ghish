@@ -30,6 +30,8 @@ class GitHubRepoSchema(Schema):
     create_date = fields.DateTime()
     organization = fields.Nested(
             "GitHubOrganizationSchema", required=False, unknown=EXCLUDE)
+    pull_requests = fields.Nested(
+            "GitHubPullRequestSchema", required=False, many=True)
     url = fields.String()
 
     @pre_load
