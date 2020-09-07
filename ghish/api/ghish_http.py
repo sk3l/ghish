@@ -6,24 +6,27 @@ from requests.exceptions import RequestException
 LOG = logging.getLogger("ghish")
 
 
-class HttpData:
+class HttpResultSet:
 
     def __init__(self):
         self._data = []
 
-    def consume(self, jsonobj):
+    def append(self, jsonobj):
         if isinstance(jsonobj, dict):
             self._data.append(jsonobj)
         elif isinstance(jsonobj, list):
             self._data.extend(jsonobj)
         else:
-            raise Exception("Non-JSON compatible object in HttpData.consume()")
+            raise Exception("Non-JSON compatible object in HttpResultSet()")
 
     def size(self):
         return len(self._data)
 
     def data(self):
         return self._data
+
+    def __getitem__(self, index):
+        return self._data[index]
 
 
 class GhishHttpAgent:
@@ -46,15 +49,27 @@ class GhishHttpAgent:
             LOG.debug("Calling GhishApiAgent.send_get()")
             self._session.params = query_params
 
-            data = HttpData()
+            results = HttpResultSet()
             next_url = f"{self._base_url}/{url}"
             while True:
                 response = self._session.get(next_url)
-                data.consume(response.json())
+                results.append(response.json())
 
-                if "Links" not in response.headers:
+                if "Link" not in response.headers:
                     break
-            return data
+
+                links = self._parse_http_links(response.headers["Link"])
+
+                next_url = None
+                for link in links:
+                    if link[1] == 'next':
+                        next_url = link[0]
+                        break
+
+                if not next_url:
+                    break
+
+            return results
         except RequestException as err:
             LOG.error(f"Error in send_get():{err}")
 
@@ -105,3 +120,21 @@ class GhishHttpAgent:
         if self._read_only:
             LOG.warn(f"Skipped GhishApiAgent.{funcname}; read-only mode.")
         return self._read_only
+
+    def _parse_http_links(self, linkstr):
+        link_list = linkstr.split(",")
+
+        links = []
+        for link in link_list:
+            # Get the next url
+            url_opn = link.index("<")
+            url_cls = link.index(">")
+            url = link[url_opn+1:url_cls]
+
+            # Get url kind (next, last, etc)
+            param_strt = link.rindex("=")
+            param = link[param_strt+1:].lstrip('"').rstrip('"')
+
+            links.append((url, param, ))
+
+        return links

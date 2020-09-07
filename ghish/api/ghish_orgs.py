@@ -17,7 +17,7 @@ class GitHubOrgsProxy:
         with GhishHttpAgent(self._api_url, token=self._auth_tok) as gh_agent:
             for name in org_names:
                 results = gh_agent.send_get(f"orgs/{name}")
-                org = results.data()[0]
+                org = results[0]
 
                 if include_users:
                     org["users"] = self._lookup_org_users(name)

@@ -17,8 +17,8 @@ class GitHubPullRequestsProxy:
         with GhishHttpAgent(self._api_url, token=self._auth_tok) as gh_agent:
             for pr in pr_nums:
                 results = gh_agent.send_get(f"repos/{repo_name}/pulls/{pr}")
+                pull_request = results[0]
 
-                pull_request = results.data()[0]
                 if include_pr_comments:
                     comments = self._lookup_repo_pull_request_comments(
                         gh_agent, repo_name, pr

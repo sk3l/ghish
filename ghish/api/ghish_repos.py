@@ -17,8 +17,7 @@ class GitHubReposProxy:
         with GhishHttpAgent(self._api_url, token=self._auth_tok) as gh_agent:
             for name in repo_names:
                 results = gh_agent.send_get(f"repos/{name}")
-
-                repo = results.data()[0]
+                repo = results[0]
 
                 if include_prs:
                     pull_requests = self._lookup_repo_pull_requests(name)
