@@ -6,6 +6,26 @@ from requests.exceptions import RequestException
 LOG = logging.getLogger("ghish")
 
 
+class HttpData:
+
+    def __init__(self):
+        self._data = []
+
+    def consume(self, jsonobj):
+        if isinstance(jsonobj, dict):
+            self._data.append(jsonobj)
+        elif isinstance(jsonobj, list):
+            self._data.extend(jsonobj)
+        else:
+            raise Exception("Non-JSON compatible object in HttpData.consume()")
+
+    def size(self):
+        return len(self._data)
+
+    def data(self):
+        return self._data
+
+
 class GhishHttpAgent:
     def __init__(self, url, token=None, read_only=True):
         self._base_url = url
@@ -25,7 +45,16 @@ class GhishHttpAgent:
         try:
             LOG.debug("Calling GhishApiAgent.send_get()")
             self._session.params = query_params
-            return self._session.get(f"{self._base_url}/{url}")
+
+            data = HttpData()
+            next_url = f"{self._base_url}/{url}"
+            while True:
+                response = self._session.get(next_url)
+                data.consume(response.json())
+
+                if "Links" not in response.headers:
+                    break
+            return data
         except RequestException as err:
             LOG.error(f"Error in send_get():{err}")
 

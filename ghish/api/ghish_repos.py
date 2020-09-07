@@ -16,8 +16,9 @@ class GitHubReposProxy:
         repo_list = []
         with GhishHttpAgent(self._api_url, token=self._auth_tok) as gh_agent:
             for name in repo_names:
-                response = gh_agent.send_get(f"repos/{name}")
-                repo = response.json()
+                results = gh_agent.send_get(f"repos/{name}")
+
+                repo = results.data()[0]
 
                 if include_prs:
                     pull_requests = self._lookup_repo_pull_requests(name)
@@ -29,16 +30,16 @@ class GitHubReposProxy:
                             pr["comments"] = comments
                     repo["pull_requests"] = pull_requests
 
-            repo_list.append(repo)
+                repo_list.append(repo)
 
         repo_s = GitHubRepoSchema(many=True)
         repos = repo_s.load(repo_list, partial=True)
         return repos
 
     def _lookup_repo_pull_requests(self, gh_agent, repo_name):
-        response = gh_agent.send_get(f"repos/{repo_name}/pulls")
-        return response.json()
+        results = gh_agent.send_get(f"repos/{repo_name}/pulls")
+        return results.data()
 
     def _lookup_repo_pull_request_comments(self, gh_agent, repo_name, pr_num):
-        response = gh_agent.send_get(f"repos/{repo_name}/pulls/{pr_num}/comments")
-        return response.json()
+        results = gh_agent.send_get(f"repos/{repo_name}/pulls/{pr_num}/comments")
+        return results.data()

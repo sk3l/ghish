@@ -16,25 +16,25 @@ class GitHubOrgsProxy:
         org_list = []
         with GhishHttpAgent(self._api_url, token=self._auth_tok) as gh_agent:
             for name in org_names:
-                response = gh_agent.send_get(f"orgs/{name}")
-                org = response.json()
+                results = gh_agent.send_get(f"orgs/{name}")
+                org = results.data()[0]
 
                 if include_users:
                     org["users"] = self._lookup_org_users(name)
 
                 if include_repos:
-                    org[name]["repos"] = self._lookup_org_repos(name)
+                    org["repos"] = self._lookup_org_repos(name)
 
-            org_list.append(org)
+                org_list.append(org)
 
         org_s = GitHubOrganizationSchema(many=True)
         orgs = org_s.load(org_list, partial=True)
         return orgs
 
     def _lookup_org_users(self, gh_agent, org_name):
-        response = gh_agent.send_get(f"orgs/{org_name}/members")
-        return response.json()
+        results = gh_agent.send_get(f"orgs/{org_name}/members")
+        return results.data()
 
     def _lookup_org_repos(self, gh_agent, org_name):
-        response = gh_agent.send_get(f"orgs/{org_name}/repos")
-        return response.json()
+        results = gh_agent.send_get(f"orgs/{org_name}/repos")
+        return results.data()
